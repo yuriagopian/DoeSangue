@@ -13,6 +13,17 @@ server.use(express.static('public'))
 // habilitar body do form midd
 server.use(express.urlencoded({extended:true}))
 
+// configurar conexão banco
+const Pool  = require('pg').Pool;
+const db =  new Pool({
+  user :'postgres',
+  password: '0000',
+  host: '172.17.0.4',
+  port: 5432,
+  database: "DOE"
+
+});
+
 
 // configurando template engione
 const nunjucks = require("nunjucks")
@@ -22,24 +33,6 @@ nunjucks.configure("./", {
 })
 
 // lista de doadores : array
-const donors = [
-  {
-    name : "diego Fernanes",
-    blood :"AB+"
-  },
-  {
-    name : "Kamila",
-    blood : "O+"
-  },
-  {
-    name : "Minasse",
-    blood : "B+"
-  },
-  {
-    name : "Tito ",
-    blood : "A+"
-  }
-]
 
 // configurando a apresentaçõa da pagina
 server.get("/", function (req,res) {
@@ -54,14 +47,22 @@ server.post("/", function (req, res) {
   const email = req.body.email
   const blood = req.body.blood 
   
+if (name =="" || email == "" || blood == ""){
+   return res.send("Todos os campos são obrigatórios") 
+}
+  //color valores dentro do banco de dados
+  const query = `insert into donors ("name", "email", "blood") 
+  values($1, $2 ,$3)`
 
-  //color valores dentro do array
-  donors.push({
-    name:name,
-    blood: blood,
+  const values = [name, email, blood]
+
+  db.query(query, values, function (err){
+    if (err) return res.send("Erro no banco de dados.")
+    
+    return res.redirect("/")
   })
 
-  return res.redirect("/")
+ 
 })
 
 
