@@ -36,8 +36,13 @@ nunjucks.configure("./", {
 
 // configurando a apresentaçõa da pagina
 server.get("/", function (req,res) {
+  db.query("Select * from donors", function (err, result) {
+    if (err) return res.send("Erro no banco de dados.")
 
-  return res.render("index.html", { donors })
+    const donors =result.rows
+    
+    return res.render("index.html", { donors })
+  }) 
 
 })
 
