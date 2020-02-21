@@ -36,7 +36,7 @@ nunjucks.configure("./", {
 
 // configurando a apresentaçõa da pagina
 server.get("/", function (req,res) {
-  db.query("Select * from donors", function (err, result) {
+  db.query("select name, blood, email from donors  order by data desc limit 8  ", function (err, result) {
     if (err) return res.send("Erro no banco de dados.")
 
     const donors =result.rows
@@ -56,8 +56,8 @@ if (name =="" || email == "" || blood == ""){
    return res.send("Todos os campos são obrigatórios") 
 }
   //color valores dentro do banco de dados
-  const query = `insert into donors ("name", "email", "blood") 
-  values($1, $2 ,$3)`
+  const query = `insert into donors ("name", "email", "blood", "data") 
+  values($1, $2 ,$3, current_date)`
 
   const values = [name, email, blood]
 
